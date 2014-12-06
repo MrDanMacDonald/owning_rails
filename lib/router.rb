@@ -1,14 +1,16 @@
 class Router
   def initialize(&block)
-    @routes = {}    
-    instance_eval(&block)
+    @paths = {}
+    instance_eval &block
   end
 
-  def match(route)
-    @routes.update route
+  def match(path)
+    @paths.update(path)
   end
 
   def recognize(path)
-    @routes[path].split('#') # 'home#index' => ['home', 'index']
+    if @paths.has_key?(path)
+      controller, action = @paths[path].split('#')
+    end
   end
 end

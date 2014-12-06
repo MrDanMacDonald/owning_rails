@@ -1,16 +1,17 @@
-require "action_controller"
-require "application_controller"
-require "active_record"
-require "router"
-require "config/routes"
+require 'action_controller'
+require 'application_controller'
+require 'active_record'
+require 'router'
+require 'config/routes'
 
 class Application
+
+  # To call the app => @app.call
   def call(env)
     request = Rack::Request.new(env)
     response = Rack::Response.new
 
-    controller_name, action_name = route(request.path_info) # /home/index
-    # ["home", "index"]
+    controller_name, action_name = route(request.path_info)
 
     controller_class = load_controller_class(controller_name) # HomeController
     controller = controller_class.new # HomeController.new
@@ -22,15 +23,14 @@ class Application
   end
 
   def route(path)
-    # => "/home/index" => ["", "home", "index"]
-    # _, controller_name, action_name = path.split("/") 
-    # [controller_name || "home", action_name || "index"]
-    Routes.recognize(path)
+    # /home/index => ['', 'controller_name', 'action_name']
+    _, controller, action = path.split('/')
+    # Or Operator => If value on the left is nil, assigns value on rights
+    [controller || 'home', action || 'index']
   end
 
   def load_controller_class(name)
-    # name = "home" => HomeController
-    require "#{name}_controller" # require "home_controller"
-    Object.const_get name.capitalize + "Controller" # "HomeController"
+    capitalized_name = name.capitalize
+    "#{capitalized_name}Controller"
   end
 end
